@@ -6,6 +6,7 @@ import (
 	"github.com/dghubble/oauth1"
 	"fmt"
 	"net/http"
+	"twitter-golang-ads-sdk/twitter_ads"
 )
 
 func init() {
@@ -14,11 +15,11 @@ func init() {
 func main() {
 	consumerKey := flag.String("consumer-key", "", "Twitter application consumer key")
 	consumerSecret := flag.String("consumer-secret", "", "Twitter application consumer secret")
-	// accessToken := flag.String("access-token", "", "Twitter application access token")
-	// accessSecret := flag.String("access-secret", "", "Twitter application access secret")
-	var _ = flag.String("access-token", "", "Twitter application access token")
-	var _ = flag.String("access-secret", "", "Twitter application access secret")
+	accessToken := flag.String("access-token", "", "Twitter application access token")
+	accessSecret := flag.String("access-secret", "", "Twitter application access secret")
 	flag.Parse()
+
+	adsAccess(*consumerKey, *consumerSecret, *accessToken, *accessSecret)
 
 	var requestSecret string
 
@@ -53,6 +54,15 @@ func oauthConfig(consumerKey, consumerSecret string) oauth1.Config{
 			RequestTokenURL: "https://api.twitter.com/oauth/request_token",
 		},
 	}
+}
+
+func adsAccess(consumerKey, consumerSecret, accessToken, accessSecret string) {
+	config := oauthConfig(consumerKey, consumerSecret)
+	token := oauth1.NewToken(accessToken, accessSecret)
+	// OAuth1 http.Client will automatically authorize Requests
+	httpClient := config.Client(oauth1.NoContext, token)
+	client := twitter_ads.NewClient(httpClient)
+	client.AccountService.Accounts(&twitter_ads.AccountsParams{})
 }
 
 func twitterAccess(consumerKey, consumerSecret, accessToken, accessSecret string) {
